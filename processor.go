@@ -37,14 +37,12 @@ func ProcessFeed(rss RSS, cfg *Config, store *Storage, llm *LLMClient, w Writer,
 		}
 
 		itemsFound = true
-
 		title := item.Title
 		if title == "" {
 			title = stripHtmlRegex(item.Description)
 		}
 
 		summary := prevSummary
-
 		if summary == "" && rss.summarize {
 			summary = getSummary(llm, item, cfg)
 		}
@@ -76,7 +74,7 @@ func ProcessFeed(rss RSS, cfg *Config, store *Storage, llm *LLMClient, w Writer,
 		}
 
 		if !seenToday {
-			store.MarkAsSeen(item.Link, summary)
+			store.MarkAsSeen(item.Link, summary, item.Title, feed.Title, feed.FeedLink)
 		}
 	}
 
@@ -94,12 +92,9 @@ func getSummary(llm *LLMClient, item *gofeed.Item, cfg *Config) string {
 		if err == nil {
 			content = scrapedText.TextContent
 		}
-
 		fmt.Println("we have crawled")
-
 		return llm.Summarize(content)
 	}
-
 	return item.Description
 }
 
@@ -142,13 +137,16 @@ func extractImageTagFromHTML(htmlText string) string {
 	if width != "" && height != "" {
 		wInt, _ := strconv.Atoi(width)
 		hInt, _ := strconv.Atoi(height)
+
 		if wInt > 0 && hInt > 0 {
 			aspectRatio := float64(wInt) / float64(hInt)
 			const maxWidth = 400
+
 			if wInt > maxWidth {
 				wInt = maxWidth
 				hInt = int(float64(wInt) / aspectRatio)
 			}
+
 			firstImgTag.SetAttr("width", fmt.Sprintf("%d", wInt))
 			firstImgTag.SetAttr("height", fmt.Sprintf("%d", hInt))
 		}
@@ -158,13 +156,14 @@ func extractImageTagFromHTML(htmlText string) string {
 	if err != nil {
 		return ""
 	}
+
 	return html
 }
 
 func formatHackerNewsLinks(w Writer, item *gofeed.Item) string {
 	desc := item.Description
-
 	commentsURL := ""
+
 	if start := strings.Index(desc, "Comments URL"); start != -1 {
 		safeStart := start + 23
 		if safeStart+45 < len(desc) {
