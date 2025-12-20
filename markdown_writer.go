@@ -26,15 +26,15 @@ func NewMarkdownWriter(cfg *Config, dateStr string) *MarkdownWriter {
 	}
 }
 
-func (w MarkdownWriter) WriteFeedHeaderRaw(title, feedURL string) string {
+func (w MarkdownWriter) WriteFeedHeaderRaw(title, articleURL string) string {
 	// Logic to reconstruct the Favicon HTML without a gofeed object
 	var src string
 	if strings.Contains(title, "Hacker News") {
 		src = "https://news.ycombinator.com/favicon.ico"
-	} else if feedURL == "" {
+	} else if articleURL == "" {
 		return fmt.Sprintf("\n### 🍵 %s\n", title)
 	} else {
-		u, err := url.Parse(feedURL)
+		u, err := url.Parse(articleURL)
 		if err != nil {
 			return fmt.Sprintf("\n### 🍵 %s\n", title)
 		}

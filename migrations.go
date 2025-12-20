@@ -49,9 +49,6 @@ func (s *Storage) applyMigrations() error {
 	if err := s.addTextColumnIfNotExists("seen", "feed_title"); err != nil {
 		return err
 	}
-	if err := s.addTextColumnIfNotExists("seen", "feed_url"); err != nil {
-		return err
-	} // Needed for favicons
 
 	if err := s.addNotificationsTableIfNotExists(); err != nil {
 		return err
@@ -111,8 +108,8 @@ func (s *Storage) addNotificationsTableIfNotExists() error {
 
 func (s *Storage) MarkAsSeen(url, summary, title, feedTitle, feedURL string) error {
 	today := time.Now().Format("2006-01-02")
-	_, err := s.db.Exec("INSERT INTO seen(url, date, summary, title, feed_title, feed_url) values(?,?,?,?,?,?)",
-		url, today, summary, title, feedTitle, feedURL)
+	_, err := s.db.Exec("INSERT INTO seen(url, date, summary, title, feed_title) values(?,?,?,?,?)",
+		url, today, summary, title, feedTitle)
 	return err
 }
 
@@ -134,7 +131,7 @@ func (s *Storage) IsSeen(link string) (bool, bool, string) {
 
 func (s *Storage) GetAllArticles() (map[string][]ArchivedItem, error) {
 	// Order by Date DESC, then by Feed Title so they group nicely
-	rows, err := s.db.Query("SELECT url, date, summary, IFNULL(title, ''), IFNULL(feed_title, ''), IFNULL(feed_url, '') FROM seen ORDER BY date DESC, feed_title ASC")
+	rows, err := s.db.Query("SELECT url, date, summary, IFNULL(title, ''), IFNULL(feed_title, '') FROM seen ORDER BY date DESC, feed_title ASC")
 	if err != nil {
 		return nil, err
 	}
@@ -144,8 +141,8 @@ func (s *Storage) GetAllArticles() (map[string][]ArchivedItem, error) {
 
 	for rows.Next() {
 		var item ArchivedItem
-		var date, summary, title, feedTitle, feedURL sql.NullString
-		if err := rows.Scan(&item.URL, &date, &summary, &title, &feedTitle, &feedURL); err != nil {
+		var date, summary, title, feedTitle sql.NullString
+		if err := rows.Scan(&item.URL, &date, &summary, &title, &feedTitle); err != nil {
 			return nil, err
 		}
 
@@ -153,7 +150,6 @@ func (s *Storage) GetAllArticles() (map[string][]ArchivedItem, error) {
 		item.Summary = summary.String
 		item.Title = title.String
 		item.FeedTitle = feedTitle.String
-		item.FeedURL = feedURL.String
 
 		// Fallback for old records where title might be empty
 		if item.Title == "" {
