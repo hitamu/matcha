@@ -24,6 +24,11 @@ Matcha is a daily digest generator for your RSS feeds and interested topics/keyw
 
 <img width="596" alt="image" src="https://user-images.githubusercontent.com/3144671/208323296-af2d6a51-7d33-42a9-a827-0e96a4a383fd.png">
 
+### On the Web
+[Read more here how to setup the web version](https://github.com/piqoni/go-digest)
+
+<img width="1080" height="676" alt="image" src="https://github.com/user-attachments/assets/6bc348a2-803d-4ed4-9bd5-e896d850b672" />
+
 ## Features
  - RSS daily **digest**, it will show only articles not previously generated
  - Optional summary of articles from OpenAI/Local LLM models for selected feeds
