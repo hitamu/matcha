@@ -65,7 +65,7 @@ func (w MarkdownWriter) WriteLink(title string, url string, newLine bool, readin
 		content += fmt.Sprintf(" (%s)", readingTime)
 	}
 	if newLine {
-		content += " \n"
+		content += "  \n"
 	}
 	return content
 }
@@ -75,7 +75,7 @@ func (w MarkdownWriter) WriteSummary(content string, newLine bool) string {
 		return ""
 	}
 	if newLine {
-		content += " \n\n"
+		content += "  \n\n"
 	}
 	return content
 }
