@@ -1,4 +1,4 @@
-module github.com/piqoni/matcha
+module github.com/hitamu/matcha
 
 go 1.18
 
